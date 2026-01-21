@@ -5,7 +5,6 @@ import (
 	"time"
 )
 
-// User struct - stores user data
 type User struct {
 	ID        int       `json:"id"`
 	Username  string    `json:"username"`
@@ -13,13 +12,10 @@ type User struct {
 	Rank      int       `json:"rank"`
 	CreatedAt time.Time `json:"created_at"`
 }
-
-// UserStore - manages users in memory
-// TODO: might need to optimize this later for millions of users
 type UserStore struct {
 	users    map[int]*User
 	userList []*User
-	mu       sync.RWMutex // for thread safety
+	mu       sync.RWMutex
 	nextID   int
 }
 
@@ -77,9 +73,7 @@ func (s *UserStore) SearchByUsername(searchTerm string) []*User {
 
 	var results []*User
 
-	// simple search - case insensitive
 	for _, user := range s.userList {
-		// check if username contains search term
 		if contains(user.Username, searchTerm) {
 			results = append(results, user)
 		}
@@ -88,9 +82,7 @@ func (s *UserStore) SearchByUsername(searchTerm string) []*User {
 	return results
 }
 
-// helper function for case-insensitive search
 func contains(str, substr string) bool {
-	// convert both to lowercase and check
 	strLower := ""
 	substrLower := ""
 
@@ -109,8 +101,6 @@ func contains(str, substr string) bool {
 			substrLower += string(ch)
 		}
 	}
-
-	// check if substr is in str
 	for i := 0; i <= len(strLower)-len(substrLower); i++ {
 		if strLower[i:i+len(substrLower)] == substrLower {
 			return true

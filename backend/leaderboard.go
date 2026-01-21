@@ -12,19 +12,16 @@ import (
 )
 
 var store *UserStore
-var seedOnce sync.Once // Ensures seeding happens only once
+var seedOnce sync.Once
 
 func init() {
 	store = NewUserStore()
 	rand.Seed(time.Now().UnixNano())
-
-	// Auto-seed on startup
 	seedOnce.Do(func() {
 		autoSeedDatabase()
 	})
 }
 
-// Auto-seed function that runs on server startup
 func autoSeedDatabase() {
 	fmt.Println("🌱 Auto-seeding database on startup...")
 
@@ -81,23 +78,17 @@ func SearchUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	results := store.SearchByUsername(query)
-
-	// need to calculate global rank for each search result
 	allUsers := store.GetAllUsers()
 	allUsers = CalculateRanks(allUsers)
-
-	// create a map to store ranks
 	rankMap := make(map[int]int)
 	for _, user := range allUsers {
 		rankMap[user.ID] = user.Rank
 	}
 
-	// assign ranks to search results
 	for _, user := range results {
 		user.Rank = rankMap[user.ID]
 	}
 
-	// sort by rank
 	sort.Slice(results, func(i, j int) bool {
 		return results[i].Rank < results[j].Rank
 	})
@@ -106,9 +97,7 @@ func SearchUsers(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(results)
 }
 
-// Keep manual seed endpoint for testing (optional)
 func SeedDatabase(w http.ResponseWriter, r *http.Request) {
-	// Check if already seeded
 	if len(store.GetAllUsers()) > 0 {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -156,7 +145,6 @@ func UpdateRating(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// background task - simulates live rating updates
 func SimulateRatingUpdates() {
 	ticker := time.NewTicker(2 * time.Second)
 	defer ticker.Stop()
@@ -178,7 +166,6 @@ func SimulateRatingUpdates() {
 		if newRating > 5000 {
 			newRating = 5000
 		}
-
 		store.UpdateRating(randomUser.ID, newRating)
 	}
 }

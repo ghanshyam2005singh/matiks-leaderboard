@@ -14,10 +14,9 @@ const getApiUrl = () => {
 
 const API_URL = getApiUrl();
 
-// Add timeout and better error handling
 const api = axios.create({
     baseURL: API_URL,
-    timeout: 10000, // 10 second timeout
+    timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
     }
@@ -40,7 +39,6 @@ export interface LeaderboardResponse {
   total_pages: number;
 }
 
-// Helper to handle errors
 const handleApiError = (error: any, operation: string) => {
     console.error(`❌ ${operation} failed:`, error);
     
@@ -55,12 +53,9 @@ const handleApiError = (error: any, operation: string) => {
     }
 };
 
-// get leaderboard with pagination
 export const getLeaderboard = async (page: number = 1): Promise<LeaderboardResponse> => {
     try {
-        console.log(`📊 Fetching leaderboard page ${page} from ${API_URL}/leaderboard`);
         const response = await api.get<LeaderboardResponse>(`/leaderboard?page=${page}`);
-        console.log('✅ Leaderboard loaded:', response.data.users?.length, 'users');
         return response.data;
     } catch (error: any) {
         handleApiError(error, 'Get leaderboard');
@@ -68,12 +63,9 @@ export const getLeaderboard = async (page: number = 1): Promise<LeaderboardRespo
     }
 };
 
-// search users by username
 export const searchUsers = async (query: string): Promise<User[]> => {
     try {
-        console.log(`🔍 Searching for: ${query}`);
         const response = await api.get<User[]>(`/search?q=${query}`);
-        console.log('✅ Found', response.data?.length, 'users');
         return response.data;
     } catch (error: any) {
         handleApiError(error, 'Search users');
@@ -81,12 +73,9 @@ export const searchUsers = async (query: string): Promise<User[]> => {
     }
 };
 
-// seed database with 10k users
 export const seedDatabase = async (): Promise<{ message: string; total: number }> => {
     try {
-        console.log('🌱 Seeding database...');
         const response = await api.post(`/seed`);
-        console.log('✅ Database seeded!', response.data);
         return response.data;
     } catch (error: any) {
         handleApiError(error, 'Seed database');

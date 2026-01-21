@@ -81,7 +81,6 @@ export default function LeaderboardScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Seed button if no data */}
       {users.length === 0 && (
         <View style={styles.header}>
           <TouchableOpacity 
@@ -93,7 +92,6 @@ export default function LeaderboardScreen() {
         </View>
       )}
 
-      {/* Leaderboard list */}
       <FlatList
         data={users}
         renderItem={renderUser}

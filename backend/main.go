@@ -15,22 +15,18 @@ func main() {
 
 	router := mux.NewRouter()
 
-	// setup routes
 	router.HandleFunc("/api/leaderboard", GetLeaderboard).Methods("GET")
 	router.HandleFunc("/api/search", SearchUsers).Methods("GET")
 	router.HandleFunc("/api/seed", SeedDatabase).Methods("POST")
 	router.HandleFunc("/api/update-rating", UpdateRating).Methods("POST")
 
-	// health check endpoint
 	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Server is running!"))
 	}).Methods("GET")
 
-	// start background simulation
 	go SimulateRatingUpdates()
 
-	// cors setup
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},

@@ -55,7 +55,6 @@ export default function SearchScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Search input */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.input}
@@ -74,7 +73,6 @@ export default function SearchScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Loading */}
       {loading && (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#2563eb" />
@@ -82,7 +80,6 @@ export default function SearchScreen() {
         </View>
       )}
 
-      {/* Results */}
       {!loading && searched && (
         <View style={styles.resultsContainer}>
           {results.length > 0 ? (
@@ -109,7 +106,6 @@ export default function SearchScreen() {
         </View>
       )}
 
-      {/* Initial state */}
       {!loading && !searched && (
         <View style={styles.initialState}>
           <Text style={styles.initialIcon}>🔎</Text>

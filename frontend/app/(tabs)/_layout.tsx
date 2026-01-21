@@ -35,7 +35,6 @@ export default function TabLayout() {
   );
 }
 
-// simple icon component - FIXED!
 function TabBarIcon({ name, color }: { name: string; color: string }) {
   const icons: Record<string, string> = {
     trophy: '🏆',
