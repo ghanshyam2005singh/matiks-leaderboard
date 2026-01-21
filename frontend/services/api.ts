@@ -1,12 +1,14 @@
 import axios from 'axios';
-import { Alert } from 'react-native';
 
 const getApiUrl = () => {
-    // For web development on laptop
-    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    const PRODUCTION_API = 'https://your-app-name.up.railway.app/api';
+    
+    if (typeof window !== 'undefined') {
+        if (window.location.hostname !== 'localhost') {
+            return PRODUCTION_API;
+        }
         return 'http://localhost:8080/api';
     }
-    // For phone/Expo Go
     return 'http://10.210.140.137:8080/api';
 }
 
