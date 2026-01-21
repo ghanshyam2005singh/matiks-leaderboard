@@ -7,14 +7,47 @@ import (
 	"net/http"
 	"sort"
 	"strconv"
+	"sync"
 	"time"
 )
 
 var store *UserStore
+var seedOnce sync.Once // Ensures seeding happens only once
 
 func init() {
 	store = NewUserStore()
 	rand.Seed(time.Now().UnixNano())
+
+	// Auto-seed on startup
+	seedOnce.Do(func() {
+		autoSeedDatabase()
+	})
+}
+
+// Auto-seed function that runs on server startup
+func autoSeedDatabase() {
+	fmt.Println("🌱 Auto-seeding database on startup...")
+
+	firstNames := []string{
+		"rahul", "priya", "amit", "sneha", "vikram", "anjali", "raj", "pooja",
+		"arjun", "neha", "rohan", "kavya", "aditya", "ishita", "karan", "divya",
+		"sanjay", "meera", "naveen", "riya",
+	}
+
+	lastNames := []string{
+		"kumar", "sharma", "patel", "singh", "gupta", "reddy", "verma", "mathur",
+		"agarwal", "joshi", "rao", "burman", "kapoor", "nair", "das", "iyer",
+	}
+
+	for i := 0; i < 10000; i++ {
+		firstName := firstNames[rand.Intn(len(firstNames))]
+		lastName := lastNames[rand.Intn(len(lastNames))]
+		username := fmt.Sprintf("%s_%s%d", firstName, lastName, rand.Intn(1000))
+		rating := rand.Intn(4901) + 100
+		store.AddUser(username, rating)
+	}
+
+	fmt.Printf("✅ Auto-seeding completed! Total users: %d\n", len(store.GetAllUsers()))
 }
 
 func GetLeaderboard(w http.ResponseWriter, r *http.Request) {
@@ -73,31 +106,19 @@ func SearchUsers(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(results)
 }
 
+// Keep manual seed endpoint for testing (optional)
 func SeedDatabase(w http.ResponseWriter, r *http.Request) {
-	firstNames := []string{
-		"rahul", "priya", "amit", "sneha", "vikram", "anjali", "raj", "pooja",
-		"arjun", "neha", "rohan", "kavya", "aditya", "ishita", "karan", "divya",
-		"sanjay", "meera", "naveen", "riya",
+	// Check if already seeded
+	if len(store.GetAllUsers()) > 0 {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"message": "Database already seeded",
+			"total":   len(store.GetAllUsers()),
+		})
+		return
 	}
 
-	lastNames := []string{
-		"kumar", "sharma", "patel", "singh", "gupta", "reddy", "verma", "mathur",
-		"agarwal", "joshi", "rao", "burman", "kapoor", "nair", "das", "iyer",
-	}
-
-	fmt.Println("Starting to seed 10,000 users...")
-
-	for i := 0; i < 10000; i++ {
-		firstName := firstNames[rand.Intn(len(firstNames))]
-		lastName := lastNames[rand.Intn(len(lastNames))]
-		username := fmt.Sprintf("%s_%s%d", firstName, lastName, rand.Intn(1000))
-
-		rating := rand.Intn(4901) + 100
-
-		store.AddUser(username, rating)
-	}
-
-	fmt.Println("Seeding completed!")
+	autoSeedDatabase()
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
