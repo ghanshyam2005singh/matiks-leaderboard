@@ -17,6 +17,16 @@ expo-env.d.ts
 *.p12
 *.key
 *.mobileprovision
+# OS
+.DS_Store
+*.swp
+*.swo
+
+# IDE
+.vscode/
+.idea/
+vscode/
+
 
 # Metro
 .metro-health-check*
